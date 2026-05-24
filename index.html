@@ -249,7 +249,7 @@
     .hero-divider {
       width: 100px; height: 1px;
       background: linear-gradient(90deg, transparent, var(--signal), transparent);
-      margin: 1.5rem auto;
+      margin: 0.5rem auto;
       opacity: 0; animation: fade-up .9s ease forwards .75s;
     }
     .hero-tagline {
@@ -1224,9 +1224,10 @@
 
         const isMob = vw <= 540;
         // Cap logo size so title+descriptor always fit below it within the viewport.
-        // textH: measured title height + Women Wear line + gap (fallback 100px before fonts load).
-        const textH = (titleH > 10 ? titleH : 100) + 32;
-        const tSz = isMob ? vw * 0.88 : Math.min(vw * 0.68, vh - 2 * textH);
+        // textH: measured title height + Women Wear + divider + margins (fallback 100px before fonts load).
+        const textH = (titleH > 10 ? titleH : 100) + 80;
+        // Math.max(sz, …) prevents the logo from shrinking on short viewports.
+        const tSz = isMob ? vw * 0.88 : Math.max(sz, Math.min(vw * 0.68, vh - 2 * textH));
         const logoSize = lerp(sz, tSz, ep);
         media.style.width  = logoSize.toFixed(1) + 'px';
         media.style.height = logoSize.toFixed(1) + 'px';
@@ -1239,9 +1240,11 @@
         img.style.filter = `drop-shadow(0 0 ${glowR.toFixed(0)}px rgba(95,231,206,${lerp(.2,.45,ep).toFixed(2)})) brightness(${lerp(1,1.12,ep).toFixed(3)})`;
 
         const initBotY = 38 / 100 * vh + sz / 2;
-        const curBotY  = lerp(38, 50, ep) / 100 * vh + logoSize / 2;
-        // Push hero-content to stay exactly at the logo bottom edge.
-        const push = Math.max(0, curBotY - initBotY);
+        // logoBotVisible = bottom of the visible circle (mask fades at 82% of radius).
+        // Using this instead of the full bounding-box bottom removes the empty gap
+        // between the visible circle edge and the title.
+        const logoBotVisible = lerp(38, 50, ep) / 100 * vh + 0.82 * logoSize / 2;
+        const push = Math.max(0, logoBotVisible + 6 - initBotY);
 
         if (text) {
           text.style.transform = `translateX(-50%) translateY(${push.toFixed(1)}px)`;
