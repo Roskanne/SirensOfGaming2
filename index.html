@@ -530,7 +530,7 @@
     }
     .col-name {
       font-family: 'Jost', sans-serif;
-      font-size: 1.6rem; font-weight: 500;
+      font-size: clamp(1.3rem, 2.5vw, 1.6rem); font-weight: 500;
       letter-spacing: .1em; text-transform: uppercase;
       color: var(--ecume); margin-bottom: .35rem;
       text-shadow: 0 2px 20px rgba(6,20,26,.8);
@@ -841,8 +841,10 @@
       .manifesto-quote { font-size: clamp(1.5rem, 6vw, 2.2rem); }
       .section-title { font-size: clamp(1.4rem, 6vw, 2rem); }
       .col-card { aspect-ratio: 5/4; }
-      .col-name { font-size: 1.3rem; }
       .col-content { padding: 1.25rem 1.5rem; }
+      .col-tagline { font-size: .88rem; }
+      .manifesto-body { font-size: .86rem; }
+      .footer-brand-tagline { font-size: 1.1rem; }
       .cta-title { font-size: clamp(2rem, 9vw, 3rem); }
       .cta-form { max-width: 100%; }
       .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
@@ -853,6 +855,13 @@
       footer { padding: 2.5rem 1.25rem 1.5rem; }
       .section-header { margin-bottom: 2.5rem; }
     }
+    /* ── TOUCH (pointer: coarse) ────────────────────── */
+    @media (pointer: coarse) {
+      body { cursor: auto; }
+      #c-ring, #c-dot { display: none; }
+      a, button, .col-card, .btn-gold, .btn-ghost, .nav-btn, .drawer-cta { cursor: pointer; }
+    }
+
   </style>
 </head>
 <body>
@@ -1129,28 +1138,30 @@
     navDrawer.querySelectorAll('a').forEach(l => l.addEventListener('click', () => toggleMenu(false)));
 
     // ── Custom Cursor ──────────────────────────────────────
-    const dot = document.getElementById('c-dot');
-    const ring = document.getElementById('c-ring');
-    let mx = 0, my = 0, rx = 0, ry = 0;
+    if (!window.matchMedia('(pointer: coarse)').matches) {
+      const dot = document.getElementById('c-dot');
+      const ring = document.getElementById('c-ring');
+      let mx = 0, my = 0, rx = 0, ry = 0;
 
-    document.addEventListener('mousemove', e => {
-      mx = e.clientX; my = e.clientY;
-      dot.style.left = mx + 'px';
-      dot.style.top  = my + 'px';
-    });
+      document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        dot.style.left = mx + 'px';
+        dot.style.top  = my + 'px';
+      });
 
-    ;(function loop() {
-      rx += (mx - rx) * .11;
-      ry += (my - ry) * .11;
-      ring.style.left = rx + 'px';
-      ring.style.top  = ry + 'px';
-      requestAnimationFrame(loop);
-    })();
+      ;(function loop() {
+        rx += (mx - rx) * .11;
+        ry += (my - ry) * .11;
+        ring.style.left = rx + 'px';
+        ring.style.top  = ry + 'px';
+        requestAnimationFrame(loop);
+      })();
 
-    document.querySelectorAll('a, button, .col-card').forEach(el => {
-      el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-      el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-    });
+      document.querySelectorAll('a, button, .col-card').forEach(el => {
+        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+      });
+    }
 
     // ── Particles ──────────────────────────────────────────
     const ptcContainer = document.getElementById('particles');
