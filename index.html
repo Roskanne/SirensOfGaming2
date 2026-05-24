@@ -1230,9 +1230,7 @@
         if (text) {
           const initBotY = 38 / 100 * vh + sz / 2;
           const curBotY  = lerp(38, 50, ep) / 100 * vh + logoSize / 2;
-          const raw   = Math.max(0, curBotY - initBotY);
-          const pivot = vh * 0.13;
-          const push  = raw <= pivot ? raw : pivot + (raw - pivot) * 0.3;
+          const push = Math.max(0, curBotY - initBotY + 24 * ep);
           text.style.transform = `translateX(-50%) translateY(${push.toFixed(1)}px)`;
         }
         if (hint) hint.classList.toggle('fade-gone', p > 0.05);
