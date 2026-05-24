@@ -220,8 +220,8 @@
       width: 100%; height: 100%; object-fit: contain;
       position: relative; z-index: 1;
       animation: logo-breathe 7s ease-in-out infinite;
-      mask-image: radial-gradient(circle closest-side at 50% 50%, black 82%, rgba(0,0,0,.45) 92%, transparent 100%);
-      -webkit-mask-image: radial-gradient(circle closest-side at 50% 50%, black 82%, rgba(0,0,0,.45) 92%, transparent 100%);
+      mask-image: radial-gradient(circle closest-side at 50% 50%, black 82%, transparent 100%);
+      -webkit-mask-image: radial-gradient(circle closest-side at 50% 50%, black 82%, transparent 100%);
       display: block;
     }
     @keyframes logo-breathe {
@@ -335,6 +335,7 @@
       display: flex;
       animation: marquee-scroll 48s linear infinite;
       white-space: nowrap;
+      will-change: transform;
     }
     .marquee-item {
       display: flex; align-items: center; gap: 2rem;
@@ -1228,10 +1229,8 @@
         media.style.height = logoSize.toFixed(1) + 'px';
         media.style.top    = lerp(38, 50, ep).toFixed(2) + '%';
 
-        const a = Math.min(lerp(82, 100, ep), 100).toFixed(1);
-        const b = Math.min(lerp(92, 105, ep), 100).toFixed(1);
-        const mask = `radial-gradient(circle closest-side at 50% 50%, black ${a}%, rgba(0,0,0,.45) ${b}%, transparent 100%)`;
-        img.style.maskImage = img.style.webkitMaskImage = mask;
+        img.style.maskImage = img.style.webkitMaskImage =
+          'radial-gradient(circle closest-side at 50% 50%, black 82%, transparent 100%)';
 
         const glowR = lerp(28, 65, ep);
         img.style.filter = `drop-shadow(0 0 ${glowR.toFixed(0)}px rgba(95,231,206,${lerp(.2,.45,ep).toFixed(2)})) brightness(${lerp(1,1.12,ep).toFixed(3)})`;
@@ -1261,6 +1260,21 @@
       if (document.fonts && document.fonts.ready) {
         document.fonts.ready.then(() => { updateTitleH(); if (!raf) raf = requestAnimationFrame(render); });
       }
+    })();
+
+    // ── Marquee seamless loop ──────────────────────────────
+    (function () {
+      const track = document.querySelector('.marquee-track');
+      if (!track) return;
+      function initMarquee() {
+        const half = Math.round(track.scrollWidth / 2);
+        if (half <= 0) return;
+        const s = document.createElement('style');
+        s.textContent = `@keyframes mq-px{from{transform:translateX(0)}to{transform:translateX(-${half}px)}}`;
+        document.head.appendChild(s);
+        track.style.animation = 'mq-px 48s linear infinite';
+      }
+      (document.fonts ? document.fonts.ready : Promise.resolve()).then(initMarquee);
     })();
 
   </script>
