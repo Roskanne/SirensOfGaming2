@@ -1233,7 +1233,8 @@
         const mask = `radial-gradient(circle closest-side at 50% 50%, black ${a}%, rgba(0,0,0,.45) ${b}%, transparent 100%)`;
         img.style.maskImage = img.style.webkitMaskImage = mask;
 
-        img.style.filter = `drop-shadow(0 0 ${lerp(28,65,ep).toFixed(0)}px rgba(95,231,206,${lerp(.2,.45,ep).toFixed(2)})) brightness(${lerp(1,1.12,ep).toFixed(3)})`;
+        const glowR = lerp(28, 65, ep);
+        img.style.filter = `drop-shadow(0 0 ${glowR.toFixed(0)}px rgba(95,231,206,${lerp(.2,.45,ep).toFixed(2)})) brightness(${lerp(1,1.12,ep).toFixed(3)})`;
 
         const initBotY = 38 / 100 * vh + sz / 2;
         const curBotY  = lerp(38, 50, ep) / 100 * vh + logoSize / 2;
@@ -1246,7 +1247,8 @@
         }
         if (descriptor) {
           const descNatY = initBotY + push + titleH + 8;
-          const extra    = Math.max(0, curBotY + 18 - descNatY);
+          const padBelow = Math.min(glowR, vh * 0.065);
+          const extra    = Math.max(0, curBotY + padBelow - descNatY);
           descriptor.style.transform = `translateY(${extra.toFixed(1)}px)`;
         }
         if (hint) hint.classList.toggle('fade-gone', p > 0.05);
@@ -1256,6 +1258,9 @@
       window.addEventListener('resize', () => { updateTitleH(); if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
       updateTitleH();
       render();
+      if (document.fonts && document.fonts.ready) {
+        document.fonts.ready.then(() => { updateTitleH(); if (!raf) raf = requestAnimationFrame(render); });
+      }
     })();
 
   </script>
