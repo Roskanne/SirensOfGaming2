@@ -1,0 +1,205 @@
+{
+  "SoG — Stay below the surface": {
+    "prefix": "sog-below",
+    "body": "Stay below the surface.",
+    "description": "Expression signature Siren #1"
+  },
+  "SoG — They feel it before they see it": {
+    "prefix": "sog-feel",
+    "body": "They feel it before they see it.",
+    "description": "Expression signature Siren #2"
+  },
+  "SoG — Don't chase. Pull.": {
+    "prefix": "sog-pull",
+    "body": "Don't chase. Pull.",
+    "description": "Expression signature Siren #3"
+  },
+  "SoG — Control the current": {
+    "prefix": "sog-current",
+    "body": "Control the current.",
+    "description": "Expression signature Siren #4"
+  },
+  "SoG — Silence is power": {
+    "prefix": "sog-silence",
+    "body": "Silence is power.",
+    "description": "Expression signature Siren #5"
+  },
+  "SoG — You don't wear it. You become it.": {
+    "prefix": "sog-become",
+    "body": "You don't wear it. You become it.",
+    "description": "Tagline principale de marque"
+  },
+  "SoG — CTA Signature EN": {
+    "prefix": "sog-cta-en",
+    "body": "Enter the Tide.",
+    "description": "CTA signature EN — hero, bannières, campagnes"
+  },
+  "SoG — CTA Signature FR": {
+    "prefix": "sog-cta-fr",
+    "body": "Entre dans la vague.",
+    "description": "CTA signature FR — hero, bannières, campagnes"
+  },
+  "SoG — CTA Fonctionnel panier": {
+    "prefix": "sog-cta-cart",
+    "body": "${1|Ajouter au panier,La faire mienne,Découvrir la pièce|}",
+    "description": "CTA fonctionnel fiche produit"
+  },
+  "SoG — Description produit courte": {
+    "prefix": "sog-desc-short",
+    "body": [
+      "Surface calme. Présence totale.",
+      "Ce n'est pas ce que tu portes.",
+      "C'est ce que tu laisses voir."
+    ],
+    "description": "Template description produit — version courte"
+  },
+  "SoG — Description produit audience froide": {
+    "prefix": "sog-desc-cold",
+    "body": [
+      "${1:Hoodie oversize, matière lourde, coupe structurée.}",
+      "Fait pour jouer. Fait pour être vue.",
+      "",
+      "Pas besoin d'en faire plus.",
+      "Stay below the surface."
+    ],
+    "description": "Template description produit — audience froide"
+  },
+  "SoG — Post réseaux sociaux": {
+    "prefix": "sog-social",
+    "body": [
+      "Ils le ressentent avant de le voir.",
+      "C'est toujours comme ça avec toi.",
+      "",
+      "Don't chase. Pull."
+    ],
+    "description": "Template post social — audience chaude"
+  },
+  "SoG — Accroche email": {
+    "prefix": "sog-email-hook",
+    "body": [
+      "Tu n'es pas là pour convaincre.",
+      "Tu l'as toujours su."
+    ],
+    "description": "Accroche email"
+  },
+  "SoG — Relance panier": {
+    "prefix": "sog-cart-recovery",
+    "body": [
+      "Ce n'est pas une pièce de plus.",
+      "C'est un signal — et il te ressemble.",
+      "",
+      "Il t'attend. Pas longtemps en stock, mais on ne te presse pas.",
+      "Quand c'est à toi, c'est à toi.",
+      "",
+      "Control the current."
+    ],
+    "description": "Template relance panier abandonné"
+  },
+  "SoG — Annonce lancement": {
+    "prefix": "sog-launch",
+    "body": [
+      "${1:Nom collection}. Elle arrive.",
+      "",
+      "${2:Une ligne de contexte sobre.}",
+      "",
+      "Enter the Tide."
+    ],
+    "description": "Annonce lancement collection"
+  },
+  "SoG — Célébration communauté": {
+    "prefix": "sog-community",
+    "body": [
+      "Vous l'avez toujours su.",
+      "",
+      "${1:Observation concrète de ce qui est là.}",
+      "",
+      "Stay below the surface."
+    ],
+    "description": "Message communauté — reconnaissance, jamais flatterie"
+  },
+  "SoG — SAV": {
+    "prefix": "sog-sav",
+    "body": [
+      "On s'en occupe.",
+      "",
+      "${1:Ce qu'on fait concrètement.}",
+      "",
+      "Merci d'être là."
+    ],
+    "description": "Réponse SAV — responsabilité calme"
+  },
+  "SoG — Rareté calme": {
+    "prefix": "sog-rarity",
+    "body": "Pas longtemps en stock, mais on ne te presse pas.",
+    "description": "Rareté énoncée comme fait serein"
+  },
+  "SoG — Valeur produit": {
+    "prefix": "sog-value",
+    "body": "Une pièce. Pensée pour durer. Pas une tendance — une présence.",
+    "description": "Ancrage valeur / prix"
+  },
+  "SoG — Lagon": {
+    "prefix": "sog-lagon",
+    "body": [
+      "Lagon.",
+      "Claire. Calme. Lumineuse.",
+      "",
+      "${1:Copy produit.}",
+      "",
+      "Stay below the surface."
+    ],
+    "description": "Template collection Lagon"
+  },
+  "SoG — Courant": {
+    "prefix": "sog-courant",
+    "body": [
+      "Courant.",
+      "Le quotidien habité.",
+      "",
+      "${1:Copy produit.}",
+      "",
+      "Control the current."
+    ],
+    "description": "Template collection Courant"
+  },
+  "SoG — Abysses": {
+    "prefix": "sog-abysses",
+    "body": [
+      "Abysses.",
+      "La profondeur n'a pas de genre.",
+      "",
+      "${1:Copy produit.}",
+      "",
+      "Silence is power."
+    ],
+    "description": "Template collection Abysses"
+  },
+  "SoG — Tempête": {
+    "prefix": "sog-tempete",
+    "body": [
+      "Tempête.",
+      "La mer ne se déchaîne pas pour qu'on la craigne.",
+      "Elle se déchaîne parce qu'elle est la mer.",
+      "",
+      "${1:Copy produit.}",
+      "",
+      "Enter the Tide."
+    ],
+    "description": "Template collection Tempête"
+  },
+  "SoG — Checklist validation": {
+    "prefix": "sog-check",
+    "body": [
+      "<!-- CHECKLIST SIREN",
+      "  [ ] Aucun point d'exclamation",
+      "  [ ] Aucun ton motivationnel / dev perso",
+      "  [ ] Pas d'urgence commerciale (vite, dépêche-toi, dernière chance)",
+      "  [ ] Le texte active — il ne convainc pas",
+      "  [ ] La lectrice se reconnaît — elle n'est pas instruite",
+      "  [ ] Le produit garde sa présence (jamais effacé par la poésie)",
+      "  [ ] CTA fonctionnel clair près du panier",
+      "-->"
+    ],
+    "description": "Checklist de validation copy Siren"
+  }
+}
