@@ -611,12 +611,13 @@
     .cta-input::placeholder { color: var(--brume-faible); }
     .cta-input:focus { border-color: rgba(95,231,206,.32); }
     .cta-submit {
-      background: linear-gradient(135deg, #DEC07A, #C4A15C);
-      border: none; padding: 1rem 1.6rem;
-      color: var(--abysse);
       font-family: 'Jost', sans-serif;
       font-size: .78rem; font-weight: 600; letter-spacing: .2em;
-      text-transform: uppercase; cursor: none;
+      text-transform: uppercase; color: var(--abysse);
+      background: linear-gradient(135deg, #DEC07A, #C4A15C);
+      padding: 1rem 2.8rem;
+      border: none;
+      cursor: none;
       display: inline-flex; align-items: center; justify-content: center;
       position: relative; overflow: hidden;
       text-shadow: 0 1px 0 rgba(255,255,255,.25);
@@ -1185,12 +1186,19 @@
 
     // ── Scroll Expansion Hero ──────────────────────────────
     (function() {
-      const root  = document.getElementById('expand-root');
-      const media = document.querySelector('.hero-logo-wrap');
-      const text  = document.querySelector('.hero-content');
-      const hint  = document.querySelector('.scroll-hint');
-      const img   = media && media.querySelector('img');
+      const root       = document.getElementById('expand-root');
+      const media      = document.querySelector('.hero-logo-wrap');
+      const text       = document.querySelector('.hero-content');
+      const hint       = document.querySelector('.scroll-hint');
+      const descriptor = document.querySelector('.hero-descriptor');
+      const img        = media && media.querySelector('img');
       if (!root || !media || !img) return;
+
+      let titleH = 0;
+      function updateTitleH() {
+        const title = document.querySelector('.hero-title');
+        if (title) titleH = title.offsetHeight;
+      }
 
       function lerp(a, b, t) { return a + (b - a) * t; }
       function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
@@ -1227,17 +1235,26 @@
 
         img.style.filter = `drop-shadow(0 0 ${lerp(28,65,ep).toFixed(0)}px rgba(95,231,206,${lerp(.2,.45,ep).toFixed(2)})) brightness(${lerp(1,1.12,ep).toFixed(3)})`;
 
+        const initBotY = 38 / 100 * vh + sz / 2;
+        const curBotY  = lerp(38, 50, ep) / 100 * vh + logoSize / 2;
+        const raw   = Math.max(0, curBotY - initBotY);
+        const pivot = vh * 0.13;
+        const push  = raw <= pivot ? raw : pivot + (raw - pivot) * 0.3;
+
         if (text) {
-          const initBotY = 38 / 100 * vh + sz / 2;
-          const curBotY  = lerp(38, 50, ep) / 100 * vh + logoSize / 2;
-          const push = Math.max(0, curBotY - initBotY + 24 * ep);
           text.style.transform = `translateX(-50%) translateY(${push.toFixed(1)}px)`;
+        }
+        if (descriptor) {
+          const descNatY = initBotY + push + titleH + 8;
+          const extra    = Math.max(0, curBotY + 18 - descNatY);
+          descriptor.style.transform = `translateY(${extra.toFixed(1)}px)`;
         }
         if (hint) hint.classList.toggle('fade-gone', p > 0.05);
       }
 
       window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
-      window.addEventListener('resize', () => { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
+      window.addEventListener('resize', () => { updateTitleH(); if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
+      updateTitleH();
       render();
     })();
 
