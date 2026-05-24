@@ -611,7 +611,7 @@
     .cta-input::placeholder { color: var(--brume-faible); }
     .cta-input:focus { border-color: rgba(95,231,206,.32); }
     .cta-submit {
-      background: linear-gradient(135deg, rgba(95,231,206,.95), var(--signal));
+      background: linear-gradient(135deg, #DEC07A, #C4A15C);
       border: none; padding: 1rem 1.6rem;
       color: var(--abysse);
       font-family: 'Jost', sans-serif;
@@ -619,11 +619,18 @@
       text-transform: uppercase; cursor: none;
       display: inline-flex; align-items: center; justify-content: center;
       position: relative; overflow: hidden;
-      text-shadow: 0 1px 0 rgba(255,255,255,.15);
-      box-shadow: 0 4px 28px rgba(95,231,206,.2), inset 0 1px 0 rgba(255,255,255,.08);
+      text-shadow: 0 1px 0 rgba(255,255,255,.25);
+      box-shadow: 0 4px 28px rgba(196,161,92,.2), inset 0 1px 0 rgba(255,255,255,.08);
       transition: transform .25s ease, box-shadow .25s ease;
     }
-    .cta-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(95,231,206,.32); }
+    .cta-submit::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.12), transparent);
+      opacity: 0; transition: opacity .25s ease;
+    }
+    .cta-submit:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(196,161,92,.32); }
+    .cta-submit:hover::after { opacity: 1; }
     .cta-note {
       font-size: .82rem; color: var(--brume);
       letter-spacing: .05em;
