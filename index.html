@@ -29,6 +29,8 @@
       --brume-faible:  #6E8786;
       --signal:        #5FE7CE;
       --signal-faible: #2E8C86;
+      --byssus:        #C9AA62;
+      --byssus-faible: #8A7430;
 
       /* Collections */
       --lagon-3:   #BFE3DC;
@@ -333,7 +335,7 @@
     }
     .marquee-track {
       display: flex;
-      animation: marquee-scroll 48s linear infinite;
+      animation: marquee-scroll 96s linear infinite;
       white-space: nowrap;
       will-change: transform;
     }
@@ -363,7 +365,7 @@
     .section-eyebrow {
       font-family: 'Jost', sans-serif;
       font-size: .78rem; letter-spacing: .45em; font-weight: 500;
-      color: #C9AA62; text-transform: uppercase;
+      color: var(--byssus); text-transform: uppercase;
       display: flex; align-items: center; gap: 1.5rem;
       margin-bottom: 3rem;
     }
@@ -748,9 +750,9 @@
     .drawer-brand-tag {
       font-family: 'Jost', sans-serif;
       font-size: .52rem; letter-spacing: .42em; font-weight: 400;
-      color: var(--signal); text-transform: uppercase;
+      color: var(--ecume); text-transform: uppercase;
       margin-bottom: 3rem;
-      opacity: .7;
+      opacity: .85;
     }
     .drawer-links {
       list-style: none;
@@ -762,7 +764,7 @@
       font-family: 'Jost', sans-serif;
       font-size: clamp(1.1rem, 3.5vw, 1.5rem);
       letter-spacing: .1em; text-transform: uppercase;
-      color: var(--brume-faible); text-decoration: none;
+      color: var(--byssus); text-decoration: none;
       display: flex; align-items: center; gap: .75rem;
       transition: color .25s ease, gap .25s ease;
       opacity: 0; transform: translateX(24px);
@@ -775,7 +777,7 @@
     .drawer-link::before {
       content: '';
       width: 0; height: 1px;
-      background: var(--signal);
+      background: var(--byssus);
       transition: width .25s ease;
       flex-shrink: 0;
     }
@@ -784,22 +786,32 @@
 
     .drawer-divider {
       width: 40px; height: 1px;
-      background: linear-gradient(90deg, var(--signal), transparent);
+      background: linear-gradient(90deg, var(--byssus), transparent);
       margin-bottom: 2.5rem;
       opacity: .4;
     }
     .drawer-cta {
       font-family: 'Jost', sans-serif;
-      font-size: .62rem; font-weight: 600; letter-spacing: .25em;
+      font-size: .72rem; font-weight: 600; letter-spacing: .22em;
       text-transform: uppercase; color: var(--abysse);
-      background: linear-gradient(135deg, rgba(95,231,206,.95), var(--signal));
+      background: linear-gradient(135deg, #DEC07A, #C4A15C);
       padding: .85rem 2rem;
-      text-decoration: none; display: inline-block;
+      text-decoration: none; display: inline-flex; align-items: center; justify-content: center;
       width: fit-content;
-      opacity: 0; transition: opacity .4s ease .3s, filter .25s ease;
+      position: relative; overflow: hidden;
+      text-shadow: 0 1px 0 rgba(255,255,255,.25);
+      box-shadow: 0 4px 28px rgba(196,161,92,.2), inset 0 1px 0 rgba(255,255,255,.08);
+      opacity: 0; transition: opacity .4s ease .3s, transform .25s ease, box-shadow .25s ease;
+    }
+    .drawer-cta::after {
+      content: '';
+      position: absolute; inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,.12), transparent);
+      opacity: 0; transition: opacity .25s ease;
     }
     #nav-drawer.open .drawer-cta { opacity: 1; }
-    .drawer-cta:hover { filter: brightness(1.1); }
+    .drawer-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(196,161,92,.32); }
+    .drawer-cta:hover::after { opacity: 1; }
 
     /* ── REVEAL ──────────────────────────────────── */
     .reveal {
@@ -830,6 +842,8 @@
     @media (max-width: 540px) {
       #nav { padding: 1rem 1.25rem; }
       .nav-btn { font-size: .52rem; padding: .4rem .85rem; }
+      #hamburger-btn { width: 40px; height: 40px; top: 1rem; right: 1.25rem; gap: 4px; }
+      #hamburger-btn .hb-bar { width: 17px; }
       .hero-logo-wrap { --sz: 240px; width: 240px; height: 240px; }
       .hero-content { top: calc(38vh + 120px - 0.25rem); white-space: normal; max-width: 96vw; }
       .hero-title { font-size: clamp(1rem, 4.9vw, 1.9rem); }
@@ -913,12 +927,25 @@
   <!-- ── MARQUEE ── -->
   <div id="expressions">
     <div class="marquee-track" aria-hidden="true">
-      <!-- Doubled for seamless loop -->
+      <!-- Set 1 -->
       <div class="marquee-item"><span class="marquee-text">Stay below the surface</span><span class="marquee-sep"></span></div>
       <div class="marquee-item"><span class="marquee-text">They feel it before they see it</span><span class="marquee-sep"></span></div>
       <div class="marquee-item"><span class="marquee-text">Don't chase. Pull.</span><span class="marquee-sep"></span></div>
       <div class="marquee-item"><span class="marquee-text">Control the current</span><span class="marquee-sep"></span></div>
       <div class="marquee-item"><span class="marquee-text">Silence is power</span><span class="marquee-sep"></span></div>
+      <!-- Set 2 (duplicate for seamless -50% loop) -->
+      <div class="marquee-item"><span class="marquee-text">Stay below the surface</span><span class="marquee-sep"></span></div>
+      <div class="marquee-item"><span class="marquee-text">They feel it before they see it</span><span class="marquee-sep"></span></div>
+      <div class="marquee-item"><span class="marquee-text">Don't chase. Pull.</span><span class="marquee-sep"></span></div>
+      <div class="marquee-item"><span class="marquee-text">Control the current</span><span class="marquee-sep"></span></div>
+      <div class="marquee-item"><span class="marquee-text">Silence is power</span><span class="marquee-sep"></span></div>
+      <!-- Set 3 (extra copy so wide screens are never blank) -->
+      <div class="marquee-item"><span class="marquee-text">Stay below the surface</span><span class="marquee-sep"></span></div>
+      <div class="marquee-item"><span class="marquee-text">They feel it before they see it</span><span class="marquee-sep"></span></div>
+      <div class="marquee-item"><span class="marquee-text">Don't chase. Pull.</span><span class="marquee-sep"></span></div>
+      <div class="marquee-item"><span class="marquee-text">Control the current</span><span class="marquee-sep"></span></div>
+      <div class="marquee-item"><span class="marquee-text">Silence is power</span><span class="marquee-sep"></span></div>
+      <!-- Set 4 -->
       <div class="marquee-item"><span class="marquee-text">Stay below the surface</span><span class="marquee-sep"></span></div>
       <div class="marquee-item"><span class="marquee-text">They feel it before they see it</span><span class="marquee-sep"></span></div>
       <div class="marquee-item"><span class="marquee-text">Don't chase. Pull.</span><span class="marquee-sep"></span></div>
@@ -1116,7 +1143,7 @@
       <li><a href="#cta" class="drawer-link">Newsletter</a></li>
     </ul>
     <div class="drawer-divider"></div>
-    <a href="#cta" class="drawer-cta">Entre dans la vague</a>
+    <a href="#cta" class="drawer-cta">Entrer dans la vague</a>
   </div>
 
   <script>
@@ -1206,12 +1233,6 @@
       const img        = media && media.querySelector('img');
       if (!root || !media || !img) return;
 
-      let titleH = 0;
-      function updateTitleH() {
-        const title = document.querySelector('.hero-title');
-        if (title) titleH = title.offsetHeight;
-      }
-
       function lerp(a, b, t) { return a + (b - a) * t; }
       function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
       function ease(t) { return t < .5 ? 2*t*t : -1 + (4-2*t)*t; }
@@ -1234,11 +1255,9 @@
         const sz = getStartSz();
 
         const isMob = vw <= 540;
-        // Cap logo size so title+descriptor always fit below it within the viewport.
-        // textH: measured title height + Women Wear + divider + margins (fallback 100px before fonts load).
-        const textH = (titleH > 10 ? titleH : 100) + 80;
-        // Math.max(sz, …) prevents the logo from shrinking on short viewports.
-        const tSz = isMob ? vw * 0.88 : Math.max(sz, Math.min(vw * 0.68, vh - 2 * textH));
+        // Target size: grow to fill ~72% of viewport width (capped at 88% of vh).
+        // Text is pushed down dynamically so no need to constrain by textH.
+        const tSz = isMob ? vw * 0.88 : Math.min(vw * 0.72, vh * 0.88);
         const logoSize = lerp(sz, tSz, ep);
         media.style.width  = logoSize.toFixed(1) + 'px';
         media.style.height = logoSize.toFixed(1) + 'px';
@@ -1267,28 +1286,10 @@
       }
 
       window.addEventListener('scroll', () => { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
-      window.addEventListener('resize', () => { updateTitleH(); if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
-      updateTitleH();
+      window.addEventListener('resize', () => { if (!raf) raf = requestAnimationFrame(render); }, { passive: true });
       render();
-      if (document.fonts && document.fonts.ready) {
-        document.fonts.ready.then(() => { updateTitleH(); if (!raf) raf = requestAnimationFrame(render); });
-      }
     })();
 
-    // ── Marquee seamless loop ──────────────────────────────
-    (function () {
-      const track = document.querySelector('.marquee-track');
-      if (!track) return;
-      function initMarquee() {
-        const half = Math.round(track.scrollWidth / 2);
-        if (half <= 0) return;
-        const s = document.createElement('style');
-        s.textContent = `@keyframes mq-px{from{transform:translateX(0)}to{transform:translateX(-${half}px)}}`;
-        document.head.appendChild(s);
-        track.style.animation = 'mq-px 48s linear infinite';
-      }
-      (document.fonts ? document.fonts.ready : Promise.resolve()).then(initMarquee);
-    })();
 
   </script>
 </body>
