@@ -696,29 +696,27 @@
     /* ── HAMBURGER MENU ─────────────────────────────── */
     #hamburger-btn {
       position: fixed;
-      top: 1.4rem; right: 1.8rem;
+      top: 1.5rem; right: 2rem;
       z-index: 600;
-      width: 46px; height: 46px;
+      width: 36px; height: 30px;
       display: flex; flex-direction: column;
-      justify-content: center; align-items: center; gap: 5px;
-      background: rgba(6,20,26,.55);
-      border: 1px solid rgba(95,231,206,.22);
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      transition: background .25s ease, border-color .25s ease;
-    }
-    #hamburger-btn:hover {
-      background: rgba(6,20,26,.78);
-      border-color: rgba(95,231,206,.5);
+      justify-content: center; align-items: flex-end; gap: 7px;
+      background: none; border: none; padding: 0;
+      cursor: none;
     }
     #hamburger-btn .hb-bar {
-      width: 20px; height: 1.5px;
-      background: var(--signal);
-      transition: transform .32s cubic-bezier(.16,1,.3,1), opacity .22s ease, width .28s ease;
+      height: 1px;
+      background: rgba(238,243,240,.7);
+      transition: transform .38s cubic-bezier(.16,1,.3,1), opacity .22s ease, width .32s ease, background .22s ease;
     }
-    #hamburger-btn.open .hb-bar:nth-child(1) { transform: translateY(6.5px) rotate(45deg); }
+    #hamburger-btn .hb-bar:nth-child(1) { width: 26px; }
+    #hamburger-btn .hb-bar:nth-child(2) { width: 19px; }
+    #hamburger-btn .hb-bar:nth-child(3) { width: 13px; }
+    #hamburger-btn:hover .hb-bar { width: 26px; background: rgba(238,243,240,1); }
+    #hamburger-btn.open .hb-bar { background: var(--byssus); }
+    #hamburger-btn.open .hb-bar:nth-child(1) { transform: translateY(8px) rotate(45deg); width: 22px; }
     #hamburger-btn.open .hb-bar:nth-child(2) { opacity: 0; width: 0; }
-    #hamburger-btn.open .hb-bar:nth-child(3) { transform: translateY(-6.5px) rotate(-45deg); }
+    #hamburger-btn.open .hb-bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); width: 22px; }
 
     #nav-overlay {
       position: fixed; inset: 0;
@@ -842,8 +840,7 @@
     @media (max-width: 540px) {
       #nav { padding: 1rem 1.25rem; }
       .nav-btn { font-size: .52rem; padding: .4rem .85rem; }
-      #hamburger-btn { width: 40px; height: 40px; top: 1rem; right: 1.25rem; gap: 4px; }
-      #hamburger-btn .hb-bar { width: 17px; }
+      #hamburger-btn { top: 1rem; right: 1.25rem; }
       .hero-logo-wrap { --sz: 240px; width: 240px; height: 240px; }
       .hero-content { top: calc(38vh + 120px - 0.25rem); white-space: normal; max-width: 96vw; }
       .hero-title { font-size: clamp(1rem, 4.9vw, 1.9rem); }
@@ -873,7 +870,7 @@
     @media (pointer: coarse) {
       body { cursor: auto; }
       #c-ring, #c-dot { display: none; }
-      a, button, .col-card, .btn-gold, .btn-ghost, .nav-btn, .drawer-cta { cursor: pointer; }
+      a, button, .col-card, .btn-gold, .btn-ghost, .nav-btn, .drawer-cta, #hamburger-btn { cursor: pointer; }
     }
 
   </style>
@@ -1270,11 +1267,11 @@
         img.style.filter = `drop-shadow(0 0 ${glowR.toFixed(0)}px rgba(95,231,206,${lerp(.2,.45,ep).toFixed(2)})) brightness(${lerp(1,1.12,ep).toFixed(3)})`;
 
         const initBotY = 38 / 100 * vh + sz / 2;
-        // logoBotVisible = bottom of the visible circle (mask fades at 82% of radius).
-        // Using this instead of the full bounding-box bottom removes the empty gap
-        // between the visible circle edge and the title.
         const logoBotVisible = lerp(38, 50, ep) / 100 * vh + 0.82 * logoSize / 2;
-        const push = Math.max(0, logoBotVisible + 6 - initBotY);
+        const rawPush = Math.max(0, logoBotVisible + 6 - initBotY);
+        // Reserve 130px below initBotY for title + "Women Wear" + divider.
+        const maxPush = Math.max(0, vh - initBotY - 130);
+        const push = Math.min(rawPush, maxPush);
 
         if (text) {
           text.style.transform = `translateX(-50%) translateY(${push.toFixed(1)}px)`;
