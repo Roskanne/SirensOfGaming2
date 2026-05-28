@@ -1,0 +1,737 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boutique — Sirens of Gaming</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400;1,9..144,500&family=Jost:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    @font-face {
+      font-family: 'Mayonice';
+      src: url('brand_assets/Mayonice.otf') format('opentype'),
+           url('brand_assets/Mayonice.ttf') format('truetype');
+      font-weight: normal; font-style: normal; font-display: swap;
+    }
+    :root {
+      --abysse: #06141A; --profond: #0B2027; --maree: #123640;
+      --ecume: #EEF3F0; --brume: #9DB3B2; --brume-faible: #6E8786;
+      --signal: #5FE7CE; --signal-faible: #2E8C86;
+      --byssus: #C9AA62; --byssus-faible: #8A7430;
+    }
+    *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { background: var(--abysse); color: var(--brume); font-family: 'Jost', sans-serif; font-weight: 300; overflow-x: hidden; cursor: none; }
+
+    /* ── CURSOR ── */
+    #c-ring, #c-dot { position: fixed; top: 0; left: 0; pointer-events: none; z-index: 9999; transform: translate(-50%,-50%); }
+    #c-dot { width: 5px; height: 5px; background: var(--signal); border-radius: 50%; }
+    #c-ring { width: 30px; height: 30px; border: 1px solid rgba(95,231,206,.5); border-radius: 50%; transition: width .25s, height .25s, border-color .25s; }
+    body.cursor-hover #c-ring { width: 46px; height: 46px; border-color: rgba(95,231,206,.85); }
+
+    /* ── GRAIN ── */
+    #grain { position: fixed; inset: 0; pointer-events: none; z-index: 200; opacity: .04; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)'/%3E%3C/svg%3E"); background-size: 200px; }
+
+    /* ── NAV ── */
+    #nav { position: fixed; top: 0; left: 0; right: 0; z-index: 100; display: flex; align-items: center; justify-content: space-between; padding: 1.4rem 3.5rem; border-bottom: 1px solid transparent; transition: background .4s, backdrop-filter .4s, border-color .4s; }
+    #nav.scrolled { background: rgba(6,20,26,.88); backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px); border-bottom-color: rgba(95,231,206,.1); }
+    .nav-logo { display: flex; align-items: center; gap: .75rem; text-decoration: none; }
+    .nav-logo img { width: 38px; height: 38px; object-fit: contain; filter: drop-shadow(0 0 8px rgba(46,140,134,.35)); }
+    .nav-name { font-size: .65rem; letter-spacing: .28em; font-weight: 500; color: var(--signal); text-transform: uppercase; }
+    .nav-right { display: flex; align-items: center; gap: 1.5rem; }
+    .nav-back { font-size: .6rem; letter-spacing: .2em; color: var(--brume-faible); text-decoration: none; text-transform: uppercase; transition: color .25s; }
+    .nav-back:hover { color: var(--signal); }
+    #cart-btn { position: relative; background: none; border: 1px solid rgba(95,231,206,.35); color: var(--signal); padding: .5rem 1.2rem; cursor: none; font-family: 'Jost', sans-serif; font-size: .6rem; letter-spacing: .22em; font-weight: 500; text-transform: uppercase; display: flex; align-items: center; gap: .6rem; transition: all .25s; }
+    #cart-btn:hover { background: rgba(95,231,206,.08); border-color: var(--signal); }
+    #cart-count { background: var(--byssus); color: var(--abysse); width: 16px; height: 16px; border-radius: 50%; font-size: .48rem; font-weight: 600; display: none; align-items: center; justify-content: center; letter-spacing: 0; }
+    #cart-count.visible { display: flex; }
+
+    /* ── SHOP HEADER ── */
+    .shop-header { padding: 9rem 3.5rem 3.5rem; position: relative; }
+    .shop-header-bg { position: absolute; inset: 0; background: radial-gradient(ellipse 60% 80% at 50% 0%, rgba(18,54,64,.45) 0%, transparent 65%), var(--abysse); pointer-events: none; }
+    .shop-header-inner { position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; }
+    .shop-eyebrow { font-size: .78rem; letter-spacing: .45em; font-weight: 500; color: var(--byssus); text-transform: uppercase; display: flex; align-items: center; gap: 1.5rem; margin-bottom: 1.25rem; }
+    .shop-eyebrow::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, rgba(95,231,206,.35), transparent); }
+    .shop-title { font-family: 'Fraunces', Georgia, serif; font-size: clamp(2.8rem, 5vw, 4.2rem); font-weight: 300; color: var(--ecume); letter-spacing: .04em; line-height: 1.2; margin-bottom: .75rem; }
+    .shop-subtitle { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-weight: 300; font-size: clamp(1rem, 1.8vw, 1.3rem); color: var(--brume); }
+
+    /* ── FILTER BAR ── */
+    .filter-bar { padding: 0 3.5rem 2.5rem; border-bottom: 1px solid rgba(95,231,206,.08); }
+    .filter-bar-inner { max-width: 1200px; margin: 0 auto; display: flex; gap: .75rem; flex-wrap: wrap; }
+    .filter-pill { font-family: 'Jost', sans-serif; font-size: .6rem; letter-spacing: .28em; font-weight: 400; text-transform: uppercase; color: var(--brume-faible); border: 1px solid rgba(157,179,178,.18); padding: .45rem 1.1rem; background: none; cursor: none; transition: color .25s, border-color .25s, background .25s; }
+    .filter-pill:hover { color: var(--signal); border-color: rgba(95,231,206,.35); }
+    .filter-pill.active { color: var(--signal); border-color: rgba(95,231,206,.55); background: rgba(95,231,206,.06); }
+
+    /* ── PRODUCTS GRID ── */
+    #products-grid { max-width: 1200px; margin: 0 auto; padding: 3.5rem; display: grid; grid-template-columns: repeat(3,1fr); gap: 2px; }
+
+    /* ── PRODUCT CARD ── */
+    .product-card { display: flex; flex-direction: column; background: var(--profond); box-shadow: inset 0 0 0 1px rgba(95,231,206,.1); transition: box-shadow .4s; overflow: hidden; }
+    .product-card:hover { box-shadow: inset 0 0 0 2px rgba(95,231,206,.5), inset 0 0 30px rgba(95,231,206,.04); }
+    .product-thumb { position: relative; aspect-ratio: 4/3; overflow: hidden; }
+    .product-thumb-bg { position: absolute; inset: 0; transition: transform .9s cubic-bezier(.25,.46,.45,.94), filter .4s; }
+    .product-card:hover .product-thumb-bg { transform: scale(1.05); filter: brightness(1.15); }
+    .product-thumb-overlay { position: absolute; inset: 0; background: linear-gradient(180deg, rgba(6,20,26,0) 40%, rgba(6,20,26,.7) 100%); }
+    .product-accent { position: absolute; top: 0; left: 0; right: 0; height: 2px; z-index: 3; }
+    .product-type-badge { position: absolute; top: 1.1rem; left: 1.1rem; z-index: 2; font-family: 'Jost', sans-serif; font-size: .48rem; letter-spacing: .35em; font-weight: 500; text-transform: uppercase; color: rgba(238,243,240,.6); padding: .25rem .6rem; border: 1px solid rgba(238,243,240,.15); background: rgba(6,20,26,.45); backdrop-filter: blur(8px); }
+    .product-col-badge { position: absolute; top: 1.1rem; right: 1.1rem; z-index: 2; font-family: 'Jost', sans-serif; font-size: .48rem; letter-spacing: .35em; font-weight: 400; text-transform: uppercase; color: rgba(95,231,206,.55); }
+    .product-info { padding: 1.5rem 1.75rem 1.75rem; display: flex; flex-direction: column; flex: 1; border-top: 1px solid rgba(95,231,206,.06); }
+    .product-name { font-family: 'Jost', sans-serif; font-size: 1.05rem; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; color: var(--ecume); margin-bottom: .3rem; }
+    .product-desc { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-weight: 300; font-size: .88rem; color: var(--brume); line-height: 1.5; margin-bottom: 1.1rem; flex: 1; }
+    .size-row { display: flex; gap: .4rem; flex-wrap: wrap; margin-bottom: .75rem; }
+    .size-pill { font-family: 'Jost', sans-serif; font-size: .52rem; letter-spacing: .22em; font-weight: 400; text-transform: uppercase; color: var(--brume-faible); border: 1px solid rgba(157,179,178,.2); padding: .3rem .55rem; background: none; cursor: none; transition: color .2s, border-color .2s, background .2s; }
+    .size-pill:hover { color: var(--signal); border-color: rgba(95,231,206,.4); }
+    .size-pill.selected { color: var(--signal); border-color: var(--signal); background: rgba(95,231,206,.08); }
+    .no-size-msg { font-family: 'Jost', sans-serif; font-size: .6rem; color: rgba(255,120,120,.75); letter-spacing: .1em; display: none; margin-bottom: .65rem; }
+    .no-size-msg.visible { display: block; }
+    .product-footer { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: auto; }
+    .product-price { font-family: 'Jost', sans-serif; font-size: 1rem; font-weight: 400; letter-spacing: .08em; color: var(--ecume); }
+    .product-price span { font-size: .65rem; color: var(--brume); margin-left: .15rem; }
+    .btn-add { font-family: 'Jost', sans-serif; font-size: .6rem; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--abysse); background: linear-gradient(135deg, #DEC07A, #C4A15C); padding: .65rem 1.4rem; border: none; cursor: none; position: relative; overflow: hidden; text-shadow: 0 1px 0 rgba(255,255,255,.25); box-shadow: 0 4px 20px rgba(196,161,92,.2), inset 0 1px 0 rgba(255,255,255,.08); transition: transform .25s, box-shadow .25s; white-space: nowrap; }
+    .btn-add::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,.12), transparent); opacity: 0; transition: opacity .25s; }
+    .btn-add:hover { transform: translateY(-1px); box-shadow: 0 6px 28px rgba(196,161,92,.32); }
+    .btn-add:hover::after { opacity: 1; }
+    .products-empty { grid-column: 1/-1; text-align: center; padding: 5rem 2rem; font-family: 'Fraunces', Georgia, serif; font-style: italic; color: var(--brume-faible); font-size: 1.1rem; line-height: 1.8; }
+
+    /* ── COLLECTION BACKGROUNDS ── */
+    .bg-lagon { background: radial-gradient(ellipse 30% 40% at 32% 28%, rgba(191,227,220,.28) 0%, transparent 55%), radial-gradient(ellipse 55% 70% at 25% 60%, rgba(0,160,150,.7) 0%, transparent 52%), radial-gradient(ellipse 50% 45% at 70% 25%, rgba(95,231,206,.25) 0%, transparent 50%), radial-gradient(ellipse 60% 50% at 50% 95%, rgba(0,70,65,.7) 0%, transparent 55%), linear-gradient(160deg, #04201A 0%, #021410 100%); }
+    .bg-courant { background: radial-gradient(ellipse 28% 35% at 68% 22%, rgba(62,100,136,.32) 0%, transparent 52%), radial-gradient(ellipse 60% 60% at 55% 40%, rgba(39,76,107,.8) 0%, transparent 55%), radial-gradient(ellipse 40% 55% at 20% 72%, rgba(19,49,74,.9) 0%, transparent 55%), radial-gradient(ellipse 35% 30% at 78% 80%, rgba(10,28,50,.55) 0%, transparent 50%), linear-gradient(150deg, #050C1A 0%, #030910 100%); }
+    .bg-abysses { background: radial-gradient(ellipse 32% 38% at 52% 30%, rgba(94,113,118,.2) 0%, transparent 52%), radial-gradient(ellipse 50% 60% at 48% 42%, rgba(47,58,64,.65) 0%, transparent 55%), radial-gradient(ellipse 60% 42% at 15% 65%, rgba(5,9,12,.92) 0%, transparent 58%), radial-gradient(ellipse 38% 48% at 82% 18%, rgba(22,29,34,.45) 0%, transparent 55%), linear-gradient(170deg, #060B10 0%, #030608 100%); }
+    .bg-tempete { background: radial-gradient(ellipse 25% 45% at 42% 18%, rgba(110,74,200,.45) 0%, transparent 50%), radial-gradient(ellipse 70% 90% at 50% 48%, rgba(50,42,85,.72) 0%, transparent 65%), radial-gradient(ellipse 42% 75% at 76% 28%, rgba(61,240,224,.08) 0%, transparent 58%), radial-gradient(ellipse 32% 32% at 18% 75%, rgba(26,21,48,.65) 0%, transparent 50%), linear-gradient(145deg, #150B28 0%, #090416 100%); }
+    .accent-lagon { background: linear-gradient(90deg, transparent, rgba(95,231,206,.7), transparent); }
+    .accent-courant { background: linear-gradient(90deg, transparent, rgba(62,100,136,.7), transparent); }
+    .accent-abysses { background: linear-gradient(90deg, transparent, rgba(94,113,118,.6), transparent); }
+    .accent-tempete { background: linear-gradient(90deg, transparent, rgba(110,74,200,.75), transparent); }
+
+    /* ── CART DRAWER ── */
+    #cart-overlay { position: fixed; inset: 0; z-index: 550; background: rgba(0,0,0,.55); opacity: 0; pointer-events: none; transition: opacity .35s; }
+    #cart-overlay.open { opacity: 1; pointer-events: all; }
+    #cart-drawer { position: fixed; top: 0; right: 0; width: min(480px, 100vw); height: 100vh; z-index: 570; background: rgba(6,20,26,.97); border-left: 1px solid rgba(95,231,206,.12); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); display: flex; flex-direction: column; transform: translateX(110%); transition: transform .5s cubic-bezier(.16,1,.3,1); }
+    #cart-drawer.open { transform: translateX(0); }
+    #cart-view { display: flex; flex-direction: column; flex: 1; min-height: 0; }
+    #checkout-view { display: none; flex-direction: column; flex: 1; min-height: 0; }
+    #checkout-view.active { display: flex; }
+    #payment-success { display: none; flex-direction: column; align-items: center; justify-content: center; flex: 1; text-align: center; padding: 2rem; gap: 1.5rem; }
+    #payment-success.active { display: flex; }
+    .cart-header { padding: 1.75rem 2rem 1.5rem; border-bottom: 1px solid rgba(95,231,206,.1); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
+    .cart-header-title { font-family: 'Jost', sans-serif; font-size: .72rem; letter-spacing: .35em; font-weight: 500; color: var(--signal); text-transform: uppercase; }
+    .cart-close { background: none; border: none; cursor: none; color: var(--brume-faible); font-size: 1.1rem; line-height: 1; padding: .2rem; transition: color .2s; }
+    .cart-close:hover { color: var(--ecume); }
+    .cart-body { flex: 1; overflow-y: auto; padding: 1.5rem 2rem; }
+    .cart-body::-webkit-scrollbar { width: 3px; }
+    .cart-body::-webkit-scrollbar-thumb { background: rgba(95,231,206,.2); }
+    .cart-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 1rem; }
+    .cart-empty p { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: 1rem; color: var(--brume-faible); line-height: 1.7; text-align: center; }
+    .cart-item { display: flex; gap: 1rem; align-items: flex-start; padding: 1rem 0; border-bottom: 1px solid rgba(95,231,206,.07); }
+    .cart-item:last-child { border-bottom: none; }
+    .cart-item-thumb { width: 52px; height: 52px; flex-shrink: 0; border: 1px solid rgba(95,231,206,.15); }
+    .cart-item-info { flex: 1; min-width: 0; }
+    .cart-item-name { font-family: 'Jost', sans-serif; font-size: .78rem; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; color: var(--ecume); margin-bottom: .2rem; }
+    .cart-item-detail { font-family: 'Jost', sans-serif; font-size: .62rem; letter-spacing: .1em; color: var(--brume-faible); text-transform: uppercase; }
+    .cart-item-right { display: flex; flex-direction: column; align-items: flex-end; gap: .5rem; flex-shrink: 0; }
+    .cart-item-price { font-family: 'Jost', sans-serif; font-size: .85rem; color: var(--ecume); }
+    .qty-controls { display: flex; align-items: center; gap: .5rem; }
+    .qty-btn { background: none; border: 1px solid rgba(95,231,206,.25); cursor: none; color: var(--brume); width: 22px; height: 22px; font-size: .7rem; display: flex; align-items: center; justify-content: center; transition: border-color .2s, color .2s; }
+    .qty-btn:hover { border-color: var(--signal); color: var(--signal); }
+    .qty-val { font-family: 'Jost', sans-serif; font-size: .75rem; color: var(--ecume); min-width: 16px; text-align: center; }
+    .cart-item-remove { background: none; border: none; cursor: none; color: var(--brume-faible); font-size: .6rem; letter-spacing: .1em; font-family: 'Jost', sans-serif; text-transform: uppercase; padding: 0; transition: color .2s; }
+    .cart-item-remove:hover { color: rgba(255,100,100,.75); }
+    .cart-footer { padding: 1.5rem 2rem 2rem; border-top: 1px solid rgba(95,231,206,.1); flex-shrink: 0; }
+    .cart-total-row { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 1.25rem; }
+    .cart-total-label { font-family: 'Jost', sans-serif; font-size: .62rem; letter-spacing: .28em; text-transform: uppercase; color: var(--brume-faible); }
+    .cart-total-amount { font-family: 'Fraunces', Georgia, serif; font-size: 1.5rem; font-weight: 300; color: var(--ecume); }
+    .cart-rarity { font-family: 'Fraunces', Georgia, serif; font-style: italic; font-size: .8rem; color: var(--brume-faible); margin-bottom: 1.25rem; line-height: 1.5; }
+    .btn-checkout { width: 100%; font-family: 'Jost', sans-serif; font-size: .72rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--abysse); background: linear-gradient(135deg, #DEC07A, #C4A15C); padding: 1rem 2rem; border: none; cursor: none; position: relative; overflow: hidden; text-shadow: 0 1px 0 rgba(255,255,255,.25); box-shadow: 0 4px 28px rgba(196,161,92,.2), inset 0 1px 0 rgba(255,255,255,.08); transition: transform .25s, box-shadow .25s; }
+    .btn-checkout::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,.12), transparent); opacity: 0; transition: opacity .25s; }
+    .btn-checkout:hover { transform: translateY(-1px); box-shadow: 0 8px 40px rgba(196,161,92,.32); }
+    .btn-checkout:hover::after { opacity: 1; }
+    .btn-checkout:disabled { opacity: .5; transform: none; cursor: none; }
+
+    /* ── CHECKOUT FORM ── */
+    .checkout-back { display: flex; align-items: center; gap: .6rem; background: none; border: none; cursor: none; font-family: 'Jost', sans-serif; font-size: .6rem; letter-spacing: .22em; text-transform: uppercase; color: var(--brume-faible); padding: 0; transition: color .2s; }
+    .checkout-back:hover { color: var(--signal); }
+    .checkout-summary { padding: 1rem 0 1.25rem; border-bottom: 1px solid rgba(95,231,206,.08); margin-bottom: 1.5rem; }
+    .checkout-line { display: flex; justify-content: space-between; font-family: 'Jost', sans-serif; font-size: .72rem; color: var(--brume); padding: .22rem 0; letter-spacing: .04em; }
+    .checkout-total-line { font-weight: 500; color: var(--ecume); margin-top: .5rem; padding-top: .75rem; border-top: 1px solid rgba(95,231,206,.1); }
+    .form-field { margin-bottom: 1.25rem; }
+    .form-label { display: block; font-family: 'Jost', sans-serif; font-size: .58rem; letter-spacing: .28em; text-transform: uppercase; color: var(--brume-faible); margin-bottom: .5rem; }
+    .form-input { width: 100%; background: rgba(238,243,240,.04); border: 1px solid rgba(238,243,240,.1); padding: .75rem 1rem; color: var(--ecume); font-family: 'Jost', sans-serif; font-size: .82rem; letter-spacing: .05em; outline: none; transition: border-color .3s; }
+    .form-input::placeholder { color: var(--brume-faible); }
+    .form-input:focus { border-color: rgba(95,231,206,.35); }
+    #stripe-card-wrap { background: rgba(238,243,240,.04); border: 1px solid rgba(238,243,240,.1); padding: .85rem 1rem; transition: border-color .3s; }
+    #stripe-card-wrap.focused { border-color: rgba(95,231,206,.35); }
+    .stripe-placeholder { font-family: 'Jost', sans-serif; font-size: .72rem; color: var(--brume-faible); letter-spacing: .04em; line-height: 1.7; padding: .5rem 0; border: 1px dashed rgba(95,231,206,.2); padding: .75rem 1rem; background: rgba(95,231,206,.03); }
+    #stripe-error { font-family: 'Jost', sans-serif; font-size: .68rem; color: rgba(255,100,100,.8); margin-top: .5rem; min-height: 1rem; letter-spacing: .04em; }
+    .security-note { display: flex; align-items: center; gap: .5rem; justify-content: center; font-family: 'Jost', sans-serif; font-size: .58rem; color: var(--brume-faible); letter-spacing: .06em; margin-top: 1rem; line-height: 1.5; text-align: center; }
+    .rgpd-note { font-family: 'Jost', sans-serif; font-size: .52rem; color: var(--brume-faible); letter-spacing: .06em; line-height: 1.7; text-align: center; margin-top: .75rem; opacity: .7; }
+    .rgpd-note a { color: var(--brume-faible); text-decoration: underline; text-underline-offset: 2px; opacity: .8; }
+    .success-check { font-size: 2.2rem; color: var(--signal); opacity: .8; }
+    .success-title { font-family: 'Fraunces', Georgia, serif; font-size: 1.6rem; font-weight: 300; color: var(--ecume); }
+    .success-body { font-family: 'Jost', sans-serif; font-size: .82rem; color: var(--brume); line-height: 1.8; }
+
+    /* ── HAMBURGER ── */
+    #hamburger-btn { position: fixed; top: 1.5rem; right: 2rem; z-index: 600; width: 36px; height: 30px; display: flex; flex-direction: column; justify-content: center; align-items: flex-end; gap: 7px; background: none; border: none; padding: 0; cursor: none; }
+    #hamburger-btn .hb-bar { height: 1px; background: rgba(238,243,240,.7); transition: transform .38s cubic-bezier(.16,1,.3,1), opacity .22s, width .32s, background .22s; }
+    #hamburger-btn .hb-bar:nth-child(1) { width: 26px; }
+    #hamburger-btn .hb-bar:nth-child(2) { width: 19px; }
+    #hamburger-btn .hb-bar:nth-child(3) { width: 13px; }
+    #hamburger-btn:hover .hb-bar { width: 26px; background: rgba(238,243,240,1); }
+    #hamburger-btn.open .hb-bar { background: var(--byssus); }
+    #hamburger-btn.open .hb-bar:nth-child(1) { transform: translateY(8px) rotate(45deg); width: 22px; }
+    #hamburger-btn.open .hb-bar:nth-child(2) { opacity: 0; width: 0; }
+    #hamburger-btn.open .hb-bar:nth-child(3) { transform: translateY(-8px) rotate(-45deg); width: 22px; }
+
+    /* ── NAV DRAWER ── */
+    #nav-overlay { position: fixed; inset: 0; z-index: 550; background: rgba(0,0,0,.55); opacity: 0; pointer-events: none; transition: opacity .35s; }
+    #nav-overlay.open { opacity: 1; pointer-events: all; }
+    #nav-drawer { position: fixed; top: 0; right: 0; width: min(360px,100vw); height: 100vh; z-index: 570; background: rgba(6,20,26,.97); border-left: 1px solid rgba(95,231,206,.12); backdrop-filter: blur(28px); -webkit-backdrop-filter: blur(28px); display: flex; flex-direction: column; justify-content: center; padding: 5rem 3rem; transform: translateX(110%); transition: transform .5s cubic-bezier(.16,1,.3,1); }
+    #nav-drawer.open { transform: translateX(0); }
+    .drawer-brand-tag { font-family: 'Jost', sans-serif; font-size: .52rem; letter-spacing: .42em; font-weight: 400; color: var(--ecume); text-transform: uppercase; margin-bottom: 3rem; opacity: .85; }
+    .drawer-links { list-style: none; display: flex; flex-direction: column; gap: 2rem; margin-bottom: 3.5rem; }
+    .drawer-links li { overflow: hidden; }
+    .drawer-link { font-family: 'Jost', sans-serif; font-size: clamp(1.1rem,3.5vw,1.5rem); letter-spacing: .1em; text-transform: uppercase; color: var(--byssus); text-decoration: none; display: flex; align-items: center; gap: .75rem; opacity: 0; transform: translateX(24px); transition: color .25s, gap .25s, opacity .4s, transform .4s; }
+    #nav-drawer.open .drawer-links li:nth-child(1) .drawer-link { transition-delay: .08s; }
+    #nav-drawer.open .drawer-links li:nth-child(2) .drawer-link { transition-delay: .15s; }
+    #nav-drawer.open .drawer-links li:nth-child(3) .drawer-link { transition-delay: .22s; }
+    #nav-drawer.open .drawer-links li:nth-child(4) .drawer-link { transition-delay: .29s; }
+    #nav-drawer.open .drawer-link { opacity: 1; transform: translateX(0); }
+    .drawer-link::before { content: ''; width: 0; height: 1px; background: var(--byssus); transition: width .25s; flex-shrink: 0; }
+    .drawer-link:hover { color: var(--ecume); gap: 1.1rem; }
+    .drawer-link:hover::before { width: 18px; }
+    .drawer-divider { width: 40px; height: 1px; background: linear-gradient(90deg, var(--byssus), transparent); margin-bottom: 2.5rem; opacity: .4; }
+    .drawer-cta { font-family: 'Jost', sans-serif; font-size: .72rem; font-weight: 600; letter-spacing: .22em; text-transform: uppercase; color: var(--abysse); background: linear-gradient(135deg, #DEC07A, #C4A15C); padding: .85rem 2rem; text-decoration: none; display: inline-flex; align-items: center; justify-content: center; width: fit-content; position: relative; overflow: hidden; text-shadow: 0 1px 0 rgba(255,255,255,.25); box-shadow: 0 4px 28px rgba(196,161,92,.2), inset 0 1px 0 rgba(255,255,255,.08); opacity: 0; transition: opacity .4s ease .3s, transform .25s, box-shadow .25s; }
+    .drawer-cta::after { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,255,255,.12), transparent); opacity: 0; transition: opacity .25s; }
+    #nav-drawer.open .drawer-cta { opacity: 1; }
+    .drawer-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(196,161,92,.32); }
+    .drawer-cta:hover::after { opacity: 1; }
+
+    /* ── FOOTER ── */
+    footer { border-top: 1px solid rgba(95,231,206,.1); padding: 3rem 3rem 2rem; margin-top: 4rem; }
+    .footer-grid { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 3rem; margin-bottom: 4rem; }
+    .footer-brand-name { font-family: 'Jost', sans-serif; font-size: .68rem; letter-spacing: .3em; font-weight: 500; color: var(--signal); text-transform: uppercase; display: block; margin-bottom: .5rem; }
+    .footer-brand-tagline { font-family: 'Mayonice', cursive; font-size: 1.7rem; font-weight: 400; line-height: 1.35; color: var(--ecume); }
+    .footer-col h4 { font-family: 'Jost', sans-serif; font-size: .58rem; letter-spacing: .3em; font-weight: 500; color: var(--signal); text-transform: uppercase; margin-bottom: 1.25rem; }
+    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: .6rem; }
+    .footer-col a { font-size: .8rem; color: var(--brume-faible); text-decoration: none; letter-spacing: .05em; transition: color .22s; }
+    .footer-col a:hover { color: var(--ecume); }
+    .footer-bottom { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; padding-top: 2rem; border-top: 1px solid rgba(95,231,206,.08); }
+    .footer-copy { font-size: .7rem; color: var(--brume-faible); letter-spacing: .08em; }
+    .footer-expr { font-family: 'Jost', sans-serif; font-size: .58rem; letter-spacing: .3em; font-weight: 400; color: var(--signal-faible); text-transform: uppercase; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) { #products-grid { grid-template-columns: repeat(2,1fr); padding: 3rem 2rem; } .shop-header { padding: 8rem 2rem 3rem; } .filter-bar { padding: 0 2rem 2rem; } }
+    @media (max-width: 700px) { #nav { padding: 1rem 1.25rem; } #hamburger-btn { top: 1rem; right: 1.25rem; } #products-grid { grid-template-columns: 1fr; padding: 2rem 1.25rem; } .shop-header { padding: 7rem 1.25rem 2.5rem; } .filter-bar { padding: 0 1.25rem 1.5rem; } .footer-grid { grid-template-columns: 1fr 1fr; } footer { padding: 2.5rem 1.25rem 1.5rem; } }
+    @media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; gap: 2rem; } .footer-bottom { flex-direction: column; gap: .75rem; text-align: center; } #cart-drawer { width: 100vw; } .nav-right .nav-back { display: none; } }
+    @media (pointer: coarse) { body { cursor: auto; } #c-ring, #c-dot { display: none; } button, a, .filter-pill, .size-pill { cursor: pointer; } }
+  </style>
+</head>
+<body>
+
+  <div id="grain"></div>
+  <div id="c-ring"></div>
+  <div id="c-dot"></div>
+
+  <nav id="nav">
+    <a href="index.html" class="nav-logo">
+      <img src="brand_assets/good.png" alt="Sirens of Gaming">
+      <span class="nav-name">Sirens of Gaming</span>
+    </a>
+    <div class="nav-right">
+      <a href="index.html" class="nav-back">← La Marque</a>
+      <button id="cart-btn" aria-label="Panier">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        Panier
+        <span id="cart-count">0</span>
+      </button>
+    </div>
+  </nav>
+
+  <header class="shop-header">
+    <div class="shop-header-bg"></div>
+    <div class="shop-header-inner">
+      <div class="shop-eyebrow">La Boutique</div>
+      <h1 class="shop-title">Portez l'univers.</h1>
+      <p class="shop-subtitle">Une pièce. Pensée pour durer. Pas une tendance — une présence.</p>
+    </div>
+  </header>
+
+  <div class="filter-bar">
+    <div class="filter-bar-inner">
+      <button class="filter-pill active" data-filter="all">Tout</button>
+      <button class="filter-pill" data-filter="lagon">01 — Lagon</button>
+      <button class="filter-pill" data-filter="courant">02 — Courant</button>
+      <button class="filter-pill" data-filter="abysses">03 — Abysses</button>
+      <button class="filter-pill" data-filter="tempete">04 — Tempête</button>
+    </div>
+  </div>
+
+  <main>
+    <div id="products-grid"></div>
+  </main>
+
+  <footer>
+    <div class="footer-grid">
+      <div>
+        <span class="footer-brand-name">Sirens of Gaming</span>
+        <p class="footer-brand-tagline">You don't wear it.<br>You become it.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Collections</h4>
+        <ul>
+          <li><a href="#" onclick="filterTo('lagon')">Lagon</a></li>
+          <li><a href="#" onclick="filterTo('courant')">Courant</a></li>
+          <li><a href="#" onclick="filterTo('abysses')">Abysses</a></li>
+          <li><a href="#" onclick="filterTo('tempete')">Tempête</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>La Marque</h4>
+        <ul>
+          <li><a href="index.html#manifesto">Manifeste</a></li>
+          <li><a href="index.html">L'Univers</a></li>
+          <li><a href="#">Contact</a></li>
+          <li><a href="#">FAQ</a></li>
+        </ul>
+      </div>
+      <div class="footer-col">
+        <h4>Rejoindre</h4>
+        <ul>
+          <li><a href="#">Instagram</a></li>
+          <li><a href="#">TikTok</a></li>
+          <li><a href="#">Twitch</a></li>
+          <li><a href="index.html#cta">Newsletter</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p class="footer-copy">© 2025 Sirens of Gaming. Tous droits réservés.</p>
+      <p class="footer-expr">Control the current.</p>
+    </div>
+  </footer>
+
+  <!-- CART OVERLAY + DRAWER -->
+  <div id="cart-overlay"></div>
+  <div id="cart-drawer" aria-hidden="true">
+
+    <!-- CART VIEW -->
+    <div id="cart-view">
+      <div class="cart-header">
+        <span class="cart-header-title">Ton panier</span>
+        <button class="cart-close" id="cart-close-btn">✕</button>
+      </div>
+      <div class="cart-body" id="cart-body"></div>
+      <div class="cart-footer" id="cart-footer" style="display:none;">
+        <div class="cart-total-row">
+          <span class="cart-total-label">Total</span>
+          <span class="cart-total-amount" id="cart-total">€0</span>
+        </div>
+        <p class="cart-rarity">Pas longtemps en stock, mais on ne te presse pas.</p>
+        <button class="btn-checkout" id="btn-to-checkout">Passer à l'achat</button>
+      </div>
+    </div>
+
+    <!-- CHECKOUT VIEW -->
+    <div id="checkout-view">
+      <div class="cart-header">
+        <button class="checkout-back" id="btn-back-to-cart">
+          <svg width="14" height="10" viewBox="0 0 14 10" fill="none"><path d="M5 1L1 5l4 4M1 5h12" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Retour
+        </button>
+        <button class="cart-close" id="checkout-close-btn">✕</button>
+      </div>
+      <div class="cart-body">
+        <div id="checkout-summary"></div>
+
+        <div class="form-field">
+          <label class="form-label" for="checkout-email">Email</label>
+          <input type="email" id="checkout-email" class="form-input" placeholder="ton@email.com" autocomplete="email">
+        </div>
+
+        <div class="form-field">
+          <label class="form-label">Carte bancaire</label>
+          <div id="stripe-card-wrap"></div>
+          <div id="stripe-error"></div>
+        </div>
+
+        <button class="btn-checkout" id="btn-pay">
+          <span id="pay-label">Confirmer la commande</span>
+        </button>
+
+        <p class="security-note">
+          <svg width="10" height="12" viewBox="0 0 10 12" fill="none"><path d="M5 1L1 3v3.5C1 9 2.8 10.8 5 11.5 7.2 10.8 9 9 9 6.5V3L5 1z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/></svg>
+          Paiement sécurisé — tes données ne passent jamais par nos serveurs
+        </p>
+        <p class="rgpd-note">Ton email et ta commande sont utilisés uniquement pour traiter et expédier ta commande. Conformément au RGPD, tu peux demander leur suppression à <a href="mailto:contact@sirensofgaming.com">contact@sirensofgaming.com</a>.</p>
+      </div>
+    </div>
+
+    <!-- SUCCESS VIEW -->
+    <div id="payment-success">
+      <p class="success-check">✓</p>
+      <p class="success-title">Commande confirmée.</p>
+      <p class="success-body">Un email de confirmation t'a été envoyé.<br>Merci d'être là.</p>
+      <button class="btn-checkout" id="btn-success-close" style="margin-top:1rem;width:auto;padding:.85rem 2.5rem;">Fermer</button>
+    </div>
+
+  </div>
+
+  <!-- HAMBURGER -->
+  <button id="hamburger-btn" aria-label="Ouvrir le menu">
+    <span class="hb-bar"></span>
+    <span class="hb-bar"></span>
+    <span class="hb-bar"></span>
+  </button>
+
+  <!-- NAV DRAWER -->
+  <div id="nav-overlay"></div>
+  <div id="nav-drawer" aria-hidden="true">
+    <span class="drawer-brand-tag">Sirens of Gaming</span>
+    <ul class="drawer-links">
+      <li><a href="index.html#manifesto" class="drawer-link">Manifeste</a></li>
+      <li><a href="index.html#collections" class="drawer-link">Collections</a></li>
+      <li><a href="#" class="drawer-link" id="drawer-cart-link">Panier</a></li>
+      <li><a href="index.html#cta" class="drawer-link">Newsletter</a></li>
+    </ul>
+    <div class="drawer-divider"></div>
+    <a href="index.html#cta" class="drawer-cta">Entrer dans la vague</a>
+  </div>
+
+  <script>
+    // ── À CONFIGURER ──────────────────────────────────────
+    // Remplace par ta clé Stripe publishable (commence par pk_live_ ou pk_test_)
+    const STRIPE_KEY = 'pk_test_51TcCLpAnfcHEI1u6ydihM5Mfmrt0DhmlynWETKKlcit4XfecI7yNkw4fPEpaCGlnxTYve8sURzd9UO7bMmM9le5900HTAegJGz';
+
+    // ── CATALOGUE PRODUITS ────────────────────────────────
+    const PRODUCTS = [
+      { id:'lagon-tshirt',   collection:'lagon',   colNum:'01', type:'T-SHIRT',   name:'Lagon',         desc:'Surface calme. Présence totale.',                             price:68, sizes:['XS','S','M','L','XL'] },
+      { id:'lagon-hoodie',   collection:'lagon',   colNum:'01', type:'HOODIE',    name:'Lagon Tide',    desc:'Ce n\'est pas ce que tu portes. C\'est ce que tu laisses voir.', price:98, sizes:['XS','S','M','L','XL'] },
+      { id:'lagon-tote',     collection:'lagon',   colNum:'01', type:'TOTE BAG',  name:'Lagon Tote',    desc:'Une pièce. Pensée pour durer.',                               price:38, sizes:[] },
+      { id:'courant-tshirt', collection:'courant', colNum:'02', type:'T-SHIRT',   name:'Courant',       desc:'Le quotidien habité.',                                        price:68, sizes:['XS','S','M','L','XL'] },
+      { id:'courant-hoodie', collection:'courant', colNum:'02', type:'HOODIE',    name:'Courant Deep',  desc:'Fait pour jouer. Fait pour être vue.',                        price:98, sizes:['XS','S','M','L','XL'] },
+      { id:'courant-cap',    collection:'courant', colNum:'02', type:'CASQUETTE', name:'Courant Cap',   desc:'Pas une tendance — une présence.',                            price:38, sizes:[] },
+      { id:'abysses-tshirt', collection:'abysses', colNum:'03', type:'T-SHIRT',   name:'Abysses',       desc:'La profondeur n\'a pas de genre.',                            price:68, sizes:['XS','S','M','L','XL'] },
+      { id:'abysses-hoodie', collection:'abysses', colNum:'03', type:'HOODIE',    name:'Abysses Void',  desc:'Silence is power.',                                           price:98, sizes:['XS','S','M','L','XL'] },
+      { id:'abysses-pin',    collection:'abysses', colNum:'03', type:'PIN',       name:'Abysses Pin',   desc:'Un signal discret. Reconnu par celles qui savent.',           price:18, sizes:[] },
+      { id:'tempete-tshirt', collection:'tempete', colNum:'04', type:'T-SHIRT',   name:'Tempête Strike',desc:'La mer ne se déchaîne pas pour qu\'on la craigne.',           price:68, sizes:['XS','S','M','L','XL'] },
+      { id:'tempete-hoodie', collection:'tempete', colNum:'04', type:'HOODIE',    name:'Tempête',       desc:'Elle se déchaîne parce qu\'elle est la mer.',                 price:98, sizes:['XS','S','M','L','XL'] },
+      { id:'tempete-cap',    collection:'tempete', colNum:'04', type:'CASQUETTE', name:'Tempête Cap',   desc:'Enter the Tide.',                                             price:38, sizes:[] },
+    ];
+
+    const WATERMARKS = {
+      lagon:   `<svg style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:62%;pointer-events:none;opacity:.09" viewBox="0 0 320 200" fill="none"><ellipse cx="160" cy="100" rx="60" ry="18" stroke="#5FE7CE" stroke-width=".8"/><ellipse cx="160" cy="100" rx="95" ry="28" stroke="#4CCFBA" stroke-width=".7"/><ellipse cx="160" cy="100" rx="130" ry="39" stroke="#3ABBA6" stroke-width=".6"/></svg>`,
+      courant: `<svg style="position:absolute;left:62%;top:42%;transform:translate(-50%,-50%);width:48%;pointer-events:none;opacity:.08" viewBox="0 0 200 200" fill="none"><path d="M100 100C100 50 150 50 150 100C150 150 50 150 50 100C50 55 140 38 152 70" stroke="#3E6488" stroke-width=".9"/><path d="M100 100C100 72 128 72 128 100C128 128 72 128 72 100C72 76 124 65 132 82" stroke="#274C6B" stroke-width=".6"/></svg>`,
+      abysses: `<svg style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:55%;pointer-events:none;opacity:.1" viewBox="0 0 240 240" fill="none"><path d="M120 20L220 120L120 220L20 120Z" stroke="#5E7176" stroke-width=".8"/><path d="M120 52L188 120L120 188L52 120Z" stroke="#6E8786" stroke-width=".7"/><circle cx="120" cy="120" r="4" stroke="#9DB3B2" stroke-width=".5" fill="none"/></svg>`,
+      tempete: `<svg style="position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);height:62%;pointer-events:none;opacity:.07" viewBox="0 0 80 200" fill="none"><path d="M55 10L20 90L45 90L10 190L65 75L40 75Z" stroke="#3DF0E0" stroke-width="1" fill="rgba(61,240,224,.08)"/></svg>`,
+    };
+
+    // ── PANIER ────────────────────────────────────────────
+    let cart = [];
+
+    const cartTotal = () => cart.reduce((s, i) => s + i.price * i.qty, 0);
+
+    function addToCart(productId, size) {
+      const p = PRODUCTS.find(x => x.id === productId);
+      if (!p) return;
+      const key = productId + (size ? '-' + size : '');
+      const existing = cart.find(i => i.key === key);
+      if (existing) { existing.qty++; }
+      else { cart.push({ key, productId, size, name: p.name, type: p.type, price: p.price, collection: p.collection, qty: 1 }); }
+      updateCartUI();
+    }
+
+    function removeFromCart(key) {
+      cart = cart.filter(i => i.key !== key);
+      updateCartUI();
+    }
+
+    function changeQty(key, delta) {
+      const item = cart.find(i => i.key === key);
+      if (!item) return;
+      item.qty = Math.max(0, item.qty + delta);
+      if (item.qty === 0) cart = cart.filter(i => i.key !== key);
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const count = cart.reduce((s, i) => s + i.qty, 0);
+      const countEl = document.getElementById('cart-count');
+      countEl.textContent = count;
+      countEl.classList.toggle('visible', count > 0);
+      renderCartBody();
+      const footer = document.getElementById('cart-footer');
+      if (footer) footer.style.display = cart.length > 0 ? 'block' : 'none';
+      const totalEl = document.getElementById('cart-total');
+      if (totalEl) totalEl.textContent = '€' + cartTotal();
+    }
+
+    function renderCartBody() {
+      const body = document.getElementById('cart-body');
+      if (!body) return;
+      if (cart.length === 0) {
+        body.innerHTML = `<div class="cart-empty"><p>Ton panier est vide.<br>Silence is power.</p></div>`;
+        return;
+      }
+      body.innerHTML = cart.map(item => `
+        <div class="cart-item">
+          <div class="cart-item-thumb bg-${item.collection}"></div>
+          <div class="cart-item-info">
+            <p class="cart-item-name">${item.name}</p>
+            <p class="cart-item-detail">${item.type}${item.size ? ' · ' + item.size : ''}</p>
+          </div>
+          <div class="cart-item-right">
+            <p class="cart-item-price">€${item.price * item.qty}</p>
+            <div class="qty-controls">
+              <button class="qty-btn" onclick="changeQty('${item.key}',-1)">−</button>
+              <span class="qty-val">${item.qty}</span>
+              <button class="qty-btn" onclick="changeQty('${item.key}',1)">+</button>
+            </div>
+            <button class="cart-item-remove" onclick="removeFromCart('${item.key}')">retirer</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // ── AFFICHAGE PRODUITS ────────────────────────────────
+    function renderProducts(filter) {
+      const grid = document.getElementById('products-grid');
+      const list = filter === 'all' ? PRODUCTS : PRODUCTS.filter(p => p.collection === filter);
+
+      if (!list.length) {
+        grid.innerHTML = `<div class="products-empty">Aucun produit dans cette collection pour l'instant.<br>Stay below the surface.</div>`;
+        return;
+      }
+
+      grid.innerHTML = list.map(p => `
+        <div class="product-card">
+          <div class="product-thumb">
+            <div class="product-thumb-bg bg-${p.collection}"></div>
+            <div class="product-thumb-overlay"></div>
+            ${WATERMARKS[p.collection] || ''}
+            <div class="product-accent accent-${p.collection}"></div>
+            <span class="product-type-badge">${p.type}</span>
+            <span class="product-col-badge">${p.colNum}</span>
+          </div>
+          <div class="product-info">
+            <h2 class="product-name">${p.name}</h2>
+            <p class="product-desc">${p.desc}</p>
+            ${p.sizes.length ? `
+              <div class="size-row" id="sizes-${p.id}">
+                ${p.sizes.map(s => `<button class="size-pill" onclick="selectSize('${p.id}','${s}',this)">${s}</button>`).join('')}
+              </div>
+              <p class="no-size-msg" id="no-size-${p.id}">Choisis une taille pour continuer.</p>
+            ` : ''}
+            <div class="product-footer">
+              <p class="product-price">€${p.price}<span>EUR</span></p>
+              <button class="btn-add" onclick="handleAdd('${p.id}')">La faire mienne</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+
+      refreshCursorListeners();
+    }
+
+    function selectSize(productId, size, btn) {
+      document.querySelectorAll(`#sizes-${productId} .size-pill`).forEach(b => b.classList.remove('selected'));
+      btn.classList.add('selected');
+      const msg = document.getElementById('no-size-' + productId);
+      if (msg) msg.classList.remove('visible');
+    }
+
+    function handleAdd(productId) {
+      const p = PRODUCTS.find(x => x.id === productId);
+      if (!p) return;
+      if (p.sizes.length) {
+        const sel = document.querySelector(`#sizes-${productId} .size-pill.selected`);
+        if (!sel) { document.getElementById('no-size-' + productId)?.classList.add('visible'); return; }
+        addToCart(productId, sel.textContent.trim());
+      } else {
+        addToCart(productId, null);
+      }
+      openCart();
+    }
+
+    function filterTo(col) {
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.toggle('active', b.dataset.filter === col));
+      renderProducts(col);
+      window.scrollTo({ top: document.getElementById('products-grid').offsetTop - 100, behavior: 'smooth' });
+    }
+
+    // ── CART DRAWER ───────────────────────────────────────
+    function openCart() {
+      document.getElementById('cart-overlay').classList.add('open');
+      document.getElementById('cart-drawer').classList.add('open');
+      document.getElementById('cart-drawer').setAttribute('aria-hidden', 'false');
+      document.body.style.overflow = 'hidden';
+      showView('cart');
+    }
+
+    function closeCart() {
+      document.getElementById('cart-overlay').classList.remove('open');
+      document.getElementById('cart-drawer').classList.remove('open');
+      document.getElementById('cart-drawer').setAttribute('aria-hidden', 'true');
+      document.body.style.overflow = '';
+    }
+
+    function showView(view) {
+      document.getElementById('cart-view').style.display        = view === 'cart'    ? 'flex'   : 'none';
+      document.getElementById('checkout-view').style.display    = view === 'checkout'? 'flex'   : 'none';
+      document.getElementById('payment-success').style.display  = view === 'success' ? 'flex'   : 'none';
+      if (view === 'cart') { document.getElementById('cart-view').style.flexDirection = 'column'; document.getElementById('cart-view').style.flex = '1'; }
+      if (view === 'checkout') { document.getElementById('checkout-view').style.flexDirection = 'column'; document.getElementById('checkout-view').style.flex = '1'; }
+      if (view === 'checkout') { renderCheckoutSummary(); initStripe(); }
+    }
+
+    function renderCheckoutSummary() {
+      const el = document.getElementById('checkout-summary');
+      el.innerHTML = `
+        <div class="checkout-summary">
+          ${cart.map(i => `<div class="checkout-line"><span>${i.name}${i.size ? ' · ' + i.size : ''} × ${i.qty}</span><span>€${i.price * i.qty}</span></div>`).join('')}
+          <div class="checkout-line checkout-total-line"><span>Total</span><span>€${cartTotal()}</span></div>
+        </div>
+      `;
+      document.getElementById('pay-label').textContent = `Confirmer · €${cartTotal()}`;
+    }
+
+    // ── STRIPE ────────────────────────────────────────────
+    let stripe, cardElement, stripeReady = false;
+
+    function initStripe() {
+      const wrap = document.getElementById('stripe-card-wrap');
+      if (stripeReady) return;
+      if (STRIPE_KEY === 'YOUR_STRIPE_PUBLISHABLE_KEY') {
+        wrap.innerHTML = `<div class="stripe-placeholder">Stripe non configuré.<br>Remplace <code>STRIPE_KEY</code> pour activer le paiement.</div>`;
+        return;
+      }
+      stripe = Stripe(STRIPE_KEY);
+      const elements = stripe.elements({ locale: 'fr' });
+      cardElement = elements.create('card', {
+        style: {
+          base: { color: '#EEF3F0', fontFamily: 'Jost, sans-serif', fontSize: '14px', fontWeight: '300', letterSpacing: '0.04em', '::placeholder': { color: '#6E8786' } },
+          invalid: { color: '#ff7070', iconColor: '#ff7070' },
+        },
+        hidePostalCode: true,
+      });
+      wrap.innerHTML = '<div id="stripe-card-el"></div>';
+      cardElement.mount('#stripe-card-el');
+      cardElement.on('focus', () => wrap.classList.add('focused'));
+      cardElement.on('blur',  () => wrap.classList.remove('focused'));
+      cardElement.on('change', e => { document.getElementById('stripe-error').textContent = e.error ? e.error.message : ''; });
+      stripeReady = true;
+    }
+
+    async function submitPayment() {
+      if (STRIPE_KEY === 'YOUR_STRIPE_PUBLISHABLE_KEY') {
+        document.getElementById('stripe-error').textContent = 'Stripe n\'est pas encore configuré.';
+        return;
+      }
+      const email = document.getElementById('checkout-email').value.trim();
+      if (!email || !email.includes('@')) {
+        document.getElementById('stripe-error').textContent = 'Saisis un email valide.';
+        return;
+      }
+      const btn = document.getElementById('btn-pay');
+      btn.disabled = true;
+      document.getElementById('pay-label').textContent = 'Traitement…';
+      document.getElementById('stripe-error').textContent = '';
+
+      try {
+        const res = await fetch('/.netlify/functions/create-payment-intent', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ amount: cartTotal() * 100, currency: 'eur', items: cart }),
+        });
+        const data = await res.json();
+        if (data.error) throw new Error(data.error);
+
+        const { error, paymentIntent } = await stripe.confirmCardPayment(data.clientSecret, {
+          payment_method: { card: cardElement, billing_details: { email } },
+        });
+        if (error) throw new Error(error.message);
+
+        if (paymentIntent.status === 'succeeded') {
+          cart = [];
+          updateCartUI();
+          showView('success');
+        }
+      } catch (err) {
+        document.getElementById('stripe-error').textContent = err.message;
+        btn.disabled = false;
+        document.getElementById('pay-label').textContent = `Confirmer · €${cartTotal()}`;
+      }
+    }
+
+    // ── EVENTS ────────────────────────────────────────────
+    document.getElementById('cart-btn').addEventListener('click', openCart);
+    document.getElementById('cart-close-btn').addEventListener('click', closeCart);
+    document.getElementById('checkout-close-btn').addEventListener('click', closeCart);
+    document.getElementById('cart-overlay').addEventListener('click', closeCart);
+    document.getElementById('btn-to-checkout').addEventListener('click', () => showView('checkout'));
+    document.getElementById('btn-back-to-cart').addEventListener('click', () => showView('cart'));
+    document.getElementById('btn-pay').addEventListener('click', submitPayment);
+    document.getElementById('btn-success-close').addEventListener('click', closeCart);
+    document.getElementById('drawer-cart-link').addEventListener('click', e => { e.preventDefault(); toggleMenu(false); openCart(); });
+
+    document.querySelectorAll('.filter-pill').forEach(btn => {
+      btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-pill').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderProducts(btn.dataset.filter);
+      });
+    });
+
+    // ── HAMBURGER ─────────────────────────────────────────
+    const hamburgerBtn = document.getElementById('hamburger-btn');
+    const navDrawer    = document.getElementById('nav-drawer');
+    const navOverlay   = document.getElementById('nav-overlay');
+
+    function toggleMenu(open) {
+      hamburgerBtn.classList.toggle('open', open);
+      navDrawer.classList.toggle('open', open);
+      navOverlay.classList.toggle('open', open);
+      navDrawer.setAttribute('aria-hidden', String(!open));
+      document.body.style.overflow = open ? 'hidden' : '';
+    }
+
+    hamburgerBtn.addEventListener('click', () => toggleMenu(!hamburgerBtn.classList.contains('open')));
+    navOverlay.addEventListener('click', () => toggleMenu(false));
+    navDrawer.querySelectorAll('a').forEach(l => {
+      if (l.id !== 'drawer-cart-link') l.addEventListener('click', () => toggleMenu(false));
+    });
+
+    // ── NAV SCROLL ────────────────────────────────────────
+    window.addEventListener('scroll', () => {
+      document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
+    }, { passive: true });
+
+    // ── CURSOR ────────────────────────────────────────────
+    function refreshCursorListeners() {
+      if (window.matchMedia('(pointer: coarse)').matches) return;
+      document.querySelectorAll('a, button, .filter-pill, .size-pill, .product-card, .btn-add').forEach(el => {
+        el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+        el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+      });
+    }
+
+    if (!window.matchMedia('(pointer: coarse)').matches) {
+      const dot = document.getElementById('c-dot'), ring = document.getElementById('c-ring');
+      let mx = 0, my = 0, rx = 0, ry = 0;
+      document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; dot.style.left = mx+'px'; dot.style.top = my+'px'; });
+      (function loop() { rx += (mx-rx)*.11; ry += (my-ry)*.11; ring.style.left = rx+'px'; ring.style.top = ry+'px'; requestAnimationFrame(loop); })();
+      refreshCursorListeners();
+    }
+
+    // ── INIT ──────────────────────────────────────────────
+    const initCol = new URLSearchParams(location.search).get('collection');
+    if (initCol && ['lagon','courant','abysses','tempete'].includes(initCol)) {
+      document.querySelectorAll('.filter-pill').forEach(b => b.classList.toggle('active', b.dataset.filter === initCol));
+      renderProducts(initCol);
+    } else {
+      renderProducts('all');
+    }
+    updateCartUI();
+  </script>
+</body>
+</html>

@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Sirens of Gaming — You don't wear it. You become it.</title>
-  <script src="https://cdn.tailwindcss.com"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400;1,9..144,500&family=Jost:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap" rel="stylesheet">
@@ -662,9 +661,9 @@
       display: block; margin-bottom: .5rem;
     }
     .footer-brand-tagline {
-      font-family: 'Fraunces', Georgia, serif;
-      font-style: italic; font-size: 1.45rem;
-      font-weight: 300; line-height: 1.4;
+      font-family: 'Mayonice', cursive;
+      font-size: 1.7rem;
+      font-weight: 400; line-height: 1.35;
       color: var(--ecume);
     }
     .footer-col h4 {
@@ -771,6 +770,7 @@
     #nav-drawer.open .drawer-links li:nth-child(1) .drawer-link { transition-delay: .08s; }
     #nav-drawer.open .drawer-links li:nth-child(2) .drawer-link { transition-delay: .15s; }
     #nav-drawer.open .drawer-links li:nth-child(3) .drawer-link { transition-delay: .22s; }
+    #nav-drawer.open .drawer-links li:nth-child(4) .drawer-link { transition-delay: .29s; }
     #nav-drawer.open .drawer-link { opacity: 1; transform: translateX(0); }
     .drawer-link::before {
       content: '';
@@ -855,7 +855,7 @@
       .col-content { padding: 1.25rem 1.5rem; }
       .col-tagline { font-size: .88rem; }
       .manifesto-body { font-size: 1rem; }
-      .footer-brand-tagline { font-size: 1.1rem; }
+      .footer-brand-tagline { font-size: 1.3rem; }
       .cta-title { font-size: clamp(2rem, 9vw, 3rem); }
       .cta-form { max-width: 100%; }
       .footer-grid { grid-template-columns: 1fr; gap: 2rem; }
@@ -981,7 +981,7 @@
       <div class="collections-grid">
 
         <!-- Lagon -->
-        <a href="#" class="col-card reveal reveal-d1">
+        <a href="lagon.html" class="col-card reveal reveal-d1">
           <div class="col-accent accent-lagon"></div>
           <span class="col-num">01</span>
           <div class="col-bg bg-lagon"></div>
@@ -1002,7 +1002,7 @@
         </a>
 
         <!-- Courant -->
-        <a href="#" class="col-card reveal reveal-d2">
+        <a href="courant.html" class="col-card reveal reveal-d2">
           <div class="col-accent accent-courant"></div>
           <span class="col-num">02</span>
           <div class="col-bg bg-courant"></div>
@@ -1021,7 +1021,7 @@
         </a>
 
         <!-- Abysses -->
-        <a href="#" class="col-card reveal reveal-d3">
+        <a href="abysses.html" class="col-card reveal reveal-d3">
           <div class="col-accent accent-abysses col-accent-bottom"></div>
           <span class="col-num">03</span>
           <div class="col-bg bg-abysses"></div>
@@ -1042,7 +1042,7 @@
         </a>
 
         <!-- Tempête -->
-        <a href="#" class="col-card reveal reveal-d4">
+        <a href="tempete.html" class="col-card reveal reveal-d4">
           <div class="col-accent accent-tempete col-accent-bottom"></div>
           <span class="col-num">04</span>
           <div class="col-bg bg-tempete"></div>
@@ -1074,8 +1074,10 @@
     <div class="cta-wrap">
       <h2 class="cta-title reveal">Entrer dans<br>la vague.</h2>
       <p class="cta-sub reveal reveal-d1">Lancement — Sois la première à savoir</p>
-      <form class="cta-form reveal reveal-d2" onsubmit="return false;">
-        <input type="email" class="cta-input" placeholder="ton@email.com">
+      <form class="cta-form reveal reveal-d2" name="newsletter" method="POST" netlify netlify-honeypot="bot-field" onsubmit="handleNewsletter(event)">
+        <input type="hidden" name="form-name" value="newsletter">
+        <input name="bot-field" style="display:none" aria-hidden="true" tabindex="-1">
+        <input type="email" name="email" class="cta-input" placeholder="ton@email.com" required autocomplete="email">
         <button type="submit" class="cta-submit">Entrer</button>
       </form>
       <p class="cta-note reveal reveal-d3">Pas de spam. Pas d'urgence. Juste la marée qui monte.</p>
@@ -1138,6 +1140,7 @@
       <li><a href="#manifesto" class="drawer-link">Manifeste</a></li>
       <li><a href="#collections" class="drawer-link">Collections</a></li>
       <li><a href="#cta" class="drawer-link">Newsletter</a></li>
+      <li><a href="shop.html" class="drawer-link">La Boutique</a></li>
     </ul>
     <div class="drawer-divider"></div>
     <a href="#cta" class="drawer-cta">Entrer dans la vague</a>
@@ -1285,6 +1288,27 @@
       render();
     })();
 
+    // ── Newsletter Netlify Forms ────────────────────────────
+    async function handleNewsletter(e) {
+      e.preventDefault();
+      const form = e.target;
+      const email = form.querySelector('[name="email"]').value.trim();
+      if (!email) return;
+      const btn = form.querySelector('.cta-submit');
+      btn.disabled = true;
+      btn.textContent = '…';
+      try {
+        await fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams({ 'form-name': 'newsletter', email }).toString(),
+        });
+        form.innerHTML = '<p style="font-family:\'Jost\',sans-serif;font-size:.82rem;letter-spacing:.12em;color:var(--signal);opacity:.9;text-align:center;padding:.5rem 0">La marée monte — tu seras la première à le savoir.</p>';
+      } catch {
+        btn.disabled = false;
+        btn.textContent = 'Entrer';
+      }
+    }
 
   </script>
 </body>
